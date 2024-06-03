@@ -11,7 +11,6 @@ export default defineConfig({
   define: {
     'process.env': {},
     'global': {},
-    'Buffer': Buffer  // Ensure Buffer is globally available
   },
   resolve: {
     alias: {

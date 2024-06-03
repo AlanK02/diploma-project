@@ -1,39 +1,60 @@
 <template>
-    <div>
-      <button @click="connectWallet">Connect Wallet</button>
-      <div>
-      <button @click="generateKeys">Generate Keys</button>
-      <div v-if="publicKey">
-        <p>Public Key:</p>
-        <textarea v-model="publicKey" readonly rows="4"></textarea>
-        <p>Private Key:</p>
-        <textarea v-model="privateKey" readonly rows="4"></textarea>
+  <div class="form">
+    <div class="form__row">
+      <div class="form__btn">
+        <button @click="connectWallet">Connect Wallet</button>
+        <button @click="generateKeys">Generate Keys</button>
       </div>
-    </div>
-      <div v-if="publicKey">
-        <div>
-      <input v-model="userInfo.firstName" placeholder="First Name" />
-      <input v-model="userInfo.lastName" placeholder="Last Name" />
-      <input v-model="userInfo.phoneNumber" placeholder="Phone Number" @blur="validatePhone" />
-      <input v-model="userInfo.email" placeholder="Email Address" @blur="validateEmail" />
-      <input v-model="userInfo.age" type="number" placeholder="Age" @blur="validateAge" />
-      <textarea v-model="userInfo.medicalHistory" placeholder="Previous Diseases, Diagnoses, and Treatments"></textarea>
-      <button @click="submitInformation">Submit Information</button>
-      <div v-if="errors.length">
-        <p><b>Please correct the following error(s):</b></p>
-        <ul>
-          <li v-for="error in errors" :key="error">{{ error }}</li>
-        </ul>
+      <div class="form__input big">
+        <textarea id="publicKey" :class="{ 'input': publicKey }" v-model="publicKey" readonly></textarea>
+        <label for="publicKey">Public Key:</label>
       </div>
-    </div>
+      <div class="form__input big">
+        <textarea id="privateKey" :class="{ 'input': privateKey }" v-model="privateKey" readonly></textarea>
+        <label for="privateKey">Private Key:</label>
+      </div>
+      <div class="form__input">
+        <input id="firstName" :class="{ 'input': userInfo.firstName }" v-model="userInfo.firstName" />
+        <label for="firstName">First Name</label>
+      </div>
+      <div class="form__input">
+        <input id="lastName" :class="{ 'input': userInfo.lastName }" v-model="userInfo.lastName" />
+        <label for="lastName">Last Name</label>
+      </div>
+      <div class="form__input" :class="{ 'error': errors.includes('Invalid phone number.')}">
+        <input id="userInfo.phoneNumber" :class="{ 'input': userInfo.phoneNumber }"
+          v-model="userInfo.phoneNumber"></input>
+        <label for="userInfo.phoneNumber">Phone Number</label>
+        <div class="form__error">Invalid phone number</div>
+      </div>
+      <div class="form__input" :class="{ 'error': errors.includes('Invalid email address.')}">
+        <input id="userInfo.email" :class="{ 'input': userInfo.email }" v-model="userInfo.email" />
+        <label for="userInfo.email">Email</label>
+        <div class="form__error">Invalid email address</div>
+      </div>
+      <div class="form__input" :class="{ 'error': errors.includes('Invalid age. Please enter a value between 0 and 120.')}">
+        <input id="userInfo.age" :class="{ 'input': userInfo.age }" v-model="userInfo.age" />
+        <label for="userInfo.age">Age</label>
+        <div class="form__error">Invalid age. Please enter a value between 0 and 120</div>
+      </div>
+      <div class="form__input">
         <select v-model="selectedOrganization">
-          <option v-for="medicalEntity in medicalEntities" :key="medicalEntity.address" :value="medicalEntity.address">
+          <option v-for="(medicalEntity, index) in medicalEntities" :selected="index === 0" :key="medicalEntity.address" :value="medicalEntity.address">
             {{ medicalEntity.name }}
           </option>
         </select>
       </div>
+      <div class="form__input big">
+        <textarea id="userInfo.medicalHistory" :class="{ 'input': userInfo.medicalHistory }"
+          v-model="userInfo.medicalHistory"></textarea>
+        <label for="userInfo.medicalHistory">Medical History</label>
+      </div>
+      <button @click="submitInformation">Submit Information</button>
     </div>
+  </div>
 </template>
+
+
 
 <script>
 import * as openpgp from 'openpgp';
@@ -100,18 +121,18 @@ export default {
       return signer;
     },
     async generateKeys() {
-        try {
-          const primaryKeyPair  = await openpgp.generateKey({
-            type: 'ecc',
-            curve: 'curve25519',
-            userIDs: { name: 'Medical Organization', email: 'medorg@example.com' },
-          });
-          this.privateKey = window.btoa(primaryKeyPair.privateKey);
-          this.publicKey = window.btoa(primaryKeyPair.publicKey);
-        } catch (error) {
-          console.error('Error generating keys:', error);
-        }
-      },
+      try {
+        const primaryKeyPair = await openpgp.generateKey({
+          type: 'ecc',
+          curve: 'curve25519',
+          userIDs: { name: 'Medical Organization', email: 'medorg@example.com' },
+        });
+        this.privateKey = window.btoa(primaryKeyPair.privateKey);
+        this.publicKey = window.btoa(primaryKeyPair.publicKey);
+      } catch (error) {
+        console.error('Error generating keys:', error);
+      }
+    },
     async connectWallet() {
       if (window.ethereum) {
         const signer = await this.getSigner();
@@ -127,14 +148,14 @@ export default {
       const contract = new ethers.Contract(contractAddress, contractABI, provider);
       const orgAddresses = await contract.getRegisteredOrganizations();
 
-    this.medicalEntities = await Promise.all(orgAddresses.map(async (address) => {
-    const details = await contract.getOrganizationDetails(address);
-    return {
-        address,
-        publicKey: details.publicKey,
-        name: `${details.name} (${address.substring(0, 6)}...)`
-    };
-    }));
+      this.medicalEntities = await Promise.all(orgAddresses.map(async (address) => {
+        const details = await contract.getOrganizationDetails(address);
+        return {
+          address,
+          publicKey: details.publicKey,
+          name: `${details.name} (${address.substring(0, 6)}...)`
+        };
+      }));
 
     },
     async encryptAndStoreData() {
@@ -173,36 +194,5 @@ export default {
 </script>
 
 <style scoped>
-div {
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-input, select, button {
-  width: 100%;
-  margin: 0.5rem 0;
-  padding: 0.8rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-button {
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #45a049;
-}
-
-@media (min-width: 480px) {
-  input, select, button {
-    width: 50%;
-  }
-}
+@import url("@/assets/style.css");
 </style>
-

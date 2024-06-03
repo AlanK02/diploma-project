@@ -4,17 +4,19 @@ import { RouterLink, RouterView } from 'vue-router'
 
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logoMain.png" width="125" height="125" />
+    <img alt="Vue logo" class="logo" src="@/assets/newLogo.png" />
 
     <div class="wrapper">
-      <nav>
-        <RouterLink to="/medical-org-actions">Medical Organization Actions</RouterLink>
-        <RouterLink to="/medical-org-sign-up">Organization Sign-up</RouterLink>
-        <RouterLink to="/user-sign-up">User Sign-up</RouterLink>
-        <RouterLink to="/admin-approve-organization">Admin page</RouterLink>
-        <RouterLink to="/user-actions">User actions</RouterLink>
-        <RouterLink to="/doctor-actions">Doctor actions</RouterLink>
-
+      <div class="mini-logo">
+        <img src="@/assets/logoLight.png" alt="">
+      </div>
+      <nav class="nav">
+        <RouterLink class="nav-link" to="/medical-org-actions">Medical Organization Actions</RouterLink>
+        <RouterLink class="nav-link" to="/medical-org-sign-up">Organization Sign-up</RouterLink>
+        <RouterLink class="nav-link" to="/user-sign-up">User Sign-up</RouterLink>
+        <RouterLink class="nav-link" to="/admin-approve-organization">Admin page</RouterLink>
+        <RouterLink class="nav-link" to="/user-actions">User actions</RouterLink>
+        <RouterLink class="nav-link" to="/doctor-actions">Doctor actions</RouterLink>
       </nav>
     </div>
   </header>
@@ -23,55 +25,79 @@ import { RouterLink, RouterView } from 'vue-router'
 </template>
 
 <style scoped>
+
 header {
-  background-color: var(--light-gray, #f9f9f9);
-  padding: 1rem 2rem;
   display: flex;
-  justify-content: space-between;
+  position: relative;
+  width: 100%;
+  margin-bottom: 200px;
+}
+
+.mini-logo {
+  width: 100px;
+  height: 100px;
+  display: flex;
+  justify-content: center;
   align-items: center;
-  border-bottom: 1px solid #e1e1e1;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  border-radius: 50%;
+}
+
+.mini-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .logo {
-  display: block;
-  transition: transform 0.3s ease;
-}
-
-.logo:hover {
-  transform: scale(1.1);
+  width: 150px;
+  height: 150px;
+  position: absolute;
+  top: 50px;
+  left: calc(50% + 140px);
+  transform: translateX(-50%);
 }
 
 .wrapper {
   flex-grow: 1;
+  position: fixed;
+  top: 0;
+  left: 0;
+  min-width: 280px;
+  max-width: 280px;
   display: flex;
-  justify-content: flex-end;
+  background: white;
+  align-items: center;
+  flex-direction: column;
+  height: 100%;
+  padding-top: 20px;
 }
 
-nav {
+.nav {
   display: flex;
-  gap: 1rem;
+  flex-direction: column;
+  width: 100%;
 }
 
-nav a {
+.nav-link {
   color: var(--dark-gray, #333);
   text-decoration: none;
+  width: 100%;
   padding: 0.5rem 1rem;
-  border-radius: 5px;
+  height: 50px;
+  font-size: 15px;
   transition: background-color 0.3s, color 0.3s;
   border: 1px solid transparent;
+  text-wrap: nowrap;
+  display: flex;
+  align-items: center;
 }
 
-nav a:hover, nav a:focus {
+.nav-link:hover,
+.nav-link:focus {
   background-color: #0056b3;
   color: white;
   border-color: #0056b3;
-}
-
-@media (min-width: 768px) {
-  header {
-    padding: 1rem 5rem;
-  }
 }
 
 :root {
@@ -79,4 +105,3 @@ nav a:hover, nav a:focus {
   --dark-gray: #333;
 }
 </style>
-

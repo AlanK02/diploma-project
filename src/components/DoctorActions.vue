@@ -1,70 +1,79 @@
 <template>
-    <div class="appointment-system">
-      <h1>Doctor System</h1>
-      <input v-model="diagnosis" placeholder="Diagnosis" />
-      <input v-model="prescription" placeholder="Prescription" />
-      <input v-model="userAddress" placeholder="User address" />
-        <button @click="encryptAndStoreData">
-                  Send appointment to user
-        </button>
+  <div class="form">
+    <h1 class="title">Doctor System</h1>
+    <div class="form__row">
+      <div class="form__input">
+        <input id="diagnosis" v-model="diagnosis" :class="{ 'input': diagnosis }" />
+        <label for="diagnosis">Diagnosis</label>
       </div>
-      <div v-if="appointments.length > 0">
-        <h2>Your Appointments</h2>
-        <ul>
-          <li v-for="appointment in appointments" :key="appointment.date">
-            Appointment on {{ new Date(Number(appointment.date * 1000n)).toLocaleString() }}
-            with User {{  appointment.patient }}
-          </li>
-        </ul>
+      <div class="form__input">
+        <input id="prescription" v-model="prescription" :class="{ 'input': prescription }" />
+        <label for="prescription">Prescription</label>
       </div>
-  </template>
-  
-  <script>
-  import { ethers } from 'ethers';
-  import { encryptData } from '@/components/encryption.js';
-  import { contractABI, contractAddress, JWT } from '@/components/config.js';
-  import axios from 'axios';
+      <div class="form__input">
+        <input id="userAddress" v-model="userAddress" :class="{ 'input': userAddress }" />
+        <label for="userAddress">User Address</label>
+      </div>
+      <button @click="encryptAndStoreData">
+        Send appointment to user
+      </button>
+    </div>
+    <h2 class="subtitle" style="margin-top: 50px;">Your Appointments</h2>
+    <div class="users" style="width: 100%;">
+      <div class="users__item" v-for="appointment in appointments" :key="appointment.date">
+        <div class="users__title">Appointment on {{ new Date(Number(appointment.date * 1000n)).toLocaleString() }}
+          with User {{ appointment.patient }}</div>
+      </div>
+    </div>
+  </div>
+</template>
 
-  export default {
-    data() {
-      return {
-        diagnosis: '',
-        prescription: '',
-        userAddress: '',
-        doctors: [],
-        appointments: [],
-        JWT: JWT
-      };
-    },
-    created() {
-      this.loadAppointments();
-    },
-    methods: {
-      async addAppointment() {
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const signer = await provider.getSigner();
-        const contract = new ethers.Contract(contractAddress, contractABI, signer);
+<script>
+import { ethers } from 'ethers';
+import { encryptData } from '@/components/encryption.js';
+import { contractABI, contractAddress, JWT } from '@/components/config.js';
+import axios from 'axios';
 
-        await contract.addAppointment(this.userAddress)
-      },
-      async loadAppointments() {
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const signer = await provider.getSigner();
-        const contract = new ethers.Contract(contractAddress, contractABI, signer);
-        const appointmentsRaw = await contract.getDoctorAppoinments();
-        this.appointments = appointmentsRaw.map(appointment => ({
-          date: appointment.date,
-          patient: appointment.patient
-        }));
-      },
-      async encryptAndStoreData() {
+export default {
+  data() {
+    return {
+      diagnosis: '',
+      prescription: '',
+      userAddress: '',
+      doctors: [],
+      appointments: [],
+      JWT: JWT
+    };
+  },
+  created() {
+    this.loadAppointments();
+  },
+  methods: {
+    async addAppointment() {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+      await contract.addAppointment(this.userAddress)
+    },
+    async loadAppointments() {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const contract = new ethers.Contract(contractAddress, contractABI, signer);
+      const appointmentsRaw = await contract.getDoctorAppoinments();
+      this.appointments = appointmentsRaw.map(appointment => ({
+        date: appointment.date,
+        patient: appointment.patient
+      }));
+    },
+    async encryptAndStoreData() {
       if (!this.diagnosis || !this.prescription) {
         alert('Please both diagnosis and prescription');
         return;
-    }
-       const provider = new ethers.BrowserProvider(window.ethereum);
-        const signer = await provider.getSigner();
-       const contract = new ethers.Contract(contractAddress, contractABI, signer);
+      }
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const contract = new ethers.Contract(contractAddress, contractABI, signer);
       const userData = await contract.getUserDataByDoctor(this.userAddress)
       const dataToEncrypt = {
         diagnosis: this.diagnosis,
@@ -95,17 +104,10 @@
         alert('Failed to encrypt or upload data. See console for details.');
       }
     }
-    }
-  };
-  </script>
-  
-  <style scoped>
-  .appointment-system {
-    padding: 20px;
-    font-family: Arial, sans-serif;
   }
-  button {
-    margin-top: 5px;
-  }
-  </style>
-  
+};
+</script>
+
+<style scoped>
+@import url("@/assets/style.css");
+</style>

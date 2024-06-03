@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
 /* color palette from <https://github.com/vuejs/theme> */
 :root {
   --vt-c-white: #ffffff;
@@ -55,13 +57,21 @@
 *::after {
   box-sizing: border-box;
   margin: 0;
+  padding: 0;
   font-weight: normal;
+  font-family: "Montserrat", sans-serif;
+  font-optical-sizing: auto;
 }
 
 body {
   min-height: 100vh;
+  width: 100%;
+  background: linear-gradient(180deg, #001e34, #00162a);
+  position: relative;
+  
+  /* min-height: 100vh;
   color: var(--color-text);
-  background: var(--color-background);
+  background: #001e34;
   transition:
     color 0.5s,
     background-color 0.5s;
@@ -80,7 +90,7 @@ body {
     'Helvetica Neue',
     sans-serif;
   font-size: 15px;
-  text-rendering: optimizeLegibility;
+  text-rendering: optimizeLegibility; */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
